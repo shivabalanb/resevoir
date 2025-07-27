@@ -1,55 +1,82 @@
-// Find all our documentation at https://docs.near.org
-use near_sdk::{log, near};
+use near_sdk::{env, log, near, store::LookupMap, AccountId, Promise};
 
-// Define the contract structure
+use crate::models::Lock;
+
+pub mod models;
+
 #[near(contract_state)]
 pub struct Contract {
-    greeting: String,
+    pub locks: LookupMap<Vec<u8>, Lock>,
 }
 
-// Define the default, which automatically initializes the contract
-impl Default for Contract {
-    fn default() -> Self {
-        Self {
-            greeting: "Hello".to_string(),
-        }
-    }
-}
-
-// Implement the contract structure
 #[near]
 impl Contract {
-    // Public method - returns the greeting saved, defaulting to DEFAULT_GREETING
-    pub fn get_greeting(&self) -> String {
-        self.greeting.clone()
+    #[init]
+    pub fn new() -> Self {
+        Self {
+            locks: LookupMap::new(b"l".to_vec()),
+        }
     }
 
-    // Public method - accepts a greeting, such as "howdy", and records it
-    pub fn set_greeting(&mut self, greeting: String) {
-        log!("Saving greeting: {greeting}");
-        self.greeting = greeting;
-    }
-}
+    #[payable]
+    pub fn lock(&mut self, user_id: AccountId, hashlock_hex: String, expiration_duration_ns: u64) {
+        // assume non-zero
+        let amount = env::attached_deposit();
 
-/*
- * The rest of this file holds the inline tests for the code above
- * Learn more about Rust tests: https://doc.rust-lang.org/book/ch11-01-writing-tests.html
- */
-#[cfg(test)]
-mod tests {
-    use super::*;
+        let resolver_id = env::predecessor_account_id();
 
-    #[test]
-    fn get_default_greeting() {
-        let contract = Contract::default();
-        // this test did not call set_greeting so should return the default "Hello" greeting
-        assert_eq!(contract.get_greeting(), "Hello");
+        let hashlock = hex::decode(hashlock_hex).expect("Failed to decode hex hashlock");
+        assert_eq!(
+            hashlock.len(),
+            32,
+            "Hashlock must be 32 bytes (a SHA256 hash)"
+        );
+
+        assert!(
+            !self.locks.contains_key(&hashlock),
+            "A lock with this hash already exists"
+        );
+
+        let expiration = env::block_timestamp() + expiration_duration_ns;
+
+        let lock: Lock = Lock {
+            user_id,
+            resolver_id,
+            amount,
+            hashlock: hashlock.clone(),
+            expiration,
+            claimed: false,
+        };
+
+        self.locks.insert(hashlock, lock);
     }
 
-    #[test]
-    fn set_then_get_greeting() {
-        let mut contract = Contract::default();
-        contract.set_greeting("howdy".to_string());
-        assert_eq!(contract.get_greeting(), "howdy");
+    // secret_hex is encoded in sha256
+    fn claim(&mut self, secret_hex: String) {
+        let secret = hex::decode(secret_hex.clone()).expect("Failed to decode hex secret");
+        let hashlock = env::sha256(&secret);
+
+        let mut lock = self
+            .locks
+            .get(&hashlock)
+            .expect("No lock found for this secret")
+            .clone();
+
+        assert_eq!(
+            env::predecessor_account_id(),
+            lock.user_id,
+            "Only the designated user can claim"
+        );
+        assert!(
+            env::block_timestamp() < lock.expiration,
+            "The lock has expired"
+        );
+        assert!(!lock.claimed, "This lock has already been claimed");
+
+        Promise::new(lock.user_id.clone()).transfer(lock.amount);
+
+        lock.claimed = true;
+        self.locks.insert(hashlock, lock);
     }
+    // fn refund()
 }

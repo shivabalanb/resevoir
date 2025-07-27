@@ -2548,6 +2548,8 @@ dependencies = [
 name = "resevoir"
 version = "0.1.0"
 dependencies = [
+ "borsh",
+ "hex",
  "near-sdk",
  "near-workspaces",
  "serde_json",
