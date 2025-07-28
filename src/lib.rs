@@ -1,4 +1,9 @@
-use near_sdk::{env, log, near, store::LookupMap, AccountId, Promise};
+use near_sdk::{
+    env, log, near,
+    serde::{self, Serialize},
+    store::LookupMap,
+    AccountId, Promise,
+};
 
 use crate::models::Lock;
 
@@ -52,7 +57,7 @@ impl Contract {
     }
 
     // secret_hex is encoded in sha256
-    fn claim(&mut self, secret_hex: String) {
+    pub fn claim(&mut self, secret_hex: String) {
         let secret = hex::decode(secret_hex.clone()).expect("Failed to decode hex secret");
         let hashlock = env::sha256(&secret);
 
@@ -76,7 +81,34 @@ impl Contract {
         Promise::new(lock.user_id.clone()).transfer(lock.amount);
 
         lock.claimed = true;
-        self.locks.insert(hashlock, lock);
+        self.locks.insert(hashlock.clone(), lock);
+
+        #[derive(Serialize)]
+        #[serde(crate = "near_sdk::serde")]
+        struct ClaimEvent<'a> {
+            hashlock_hex: String,
+            secret_hex: &'a str,
+        }
+
+        env::log_str(
+            &serde_json::to_string(&ClaimEvent {
+                hashlock_hex: hex::encode(&hashlock),
+                secret_hex: &secret_hex,
+            })
+            .unwrap(),
+        );
     }
-    // fn refund()
+
+    pub fn refund(&mut self, hashlock_hex: String){
+        let hashlock = hex::decode(hashlock_hex.clone()).expect("Failed to decode hashlock");
+
+        let lock = self.locks.remove(&hashlock).expect("No lock found for this hash");
+
+        assert_eq!(env::predecessor_account_id(),lock.resolver_id,"Only the resolver can refund");
+        assert!(!lock.claimed,"This lock has already been claimed");
+        assert!(env::block_timestamp()>lock.expiration,"The lock has not expired yet");
+
+        Promise::new(lock.resolver_id.clone()).transfer(lock.amount);
+
+    }
 }
