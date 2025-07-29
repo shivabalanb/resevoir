@@ -1,9 +1,4 @@
-use near_sdk::{
-    env, log, near,
-    serde::{self, Serialize},
-    store::LookupMap,
-    AccountId, Promise,
-};
+use near_sdk::{env, near, serde::Serialize, store::LookupMap, AccountId, Promise};
 
 use crate::models::Lock;
 
@@ -12,6 +7,12 @@ pub mod models;
 #[near(contract_state)]
 pub struct Contract {
     pub locks: LookupMap<Vec<u8>, Lock>,
+}
+
+impl Default for Contract {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[near]
@@ -99,16 +100,25 @@ impl Contract {
         );
     }
 
-    pub fn refund(&mut self, hashlock_hex: String){
+    pub fn refund(&mut self, hashlock_hex: String) {
         let hashlock = hex::decode(hashlock_hex.clone()).expect("Failed to decode hashlock");
 
-        let lock = self.locks.remove(&hashlock).expect("No lock found for this hash");
+        let lock = self
+            .locks
+            .remove(&hashlock)
+            .expect("No lock found for this hash");
 
-        assert_eq!(env::predecessor_account_id(),lock.resolver_id,"Only the resolver can refund");
-        assert!(!lock.claimed,"This lock has already been claimed");
-        assert!(env::block_timestamp()>lock.expiration,"The lock has not expired yet");
+        assert_eq!(
+            env::predecessor_account_id(),
+            lock.resolver_id,
+            "Only the resolver can refund"
+        );
+        assert!(!lock.claimed, "This lock has already been claimed");
+        assert!(
+            env::block_timestamp() > lock.expiration,
+            "The lock has not expired yet"
+        );
 
         Promise::new(lock.resolver_id.clone()).transfer(lock.amount);
-
     }
 }

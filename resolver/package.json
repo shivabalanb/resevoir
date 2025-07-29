@@ -10,9 +10,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@near-js/accounts": "^2.2.4",
+    "@near-js/crypto": "^2.2.4",
+    "@near-js/providers": "^2.2.4",
+    "@near-js/signers": "^2.2.4",
+    "@near-js/utils": "^2.2.4",
     "dotenv": "^17.2.1",
     "ethers": "^6.15.0",
-    "near-api-js": "^6.2.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
