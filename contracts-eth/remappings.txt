@@ -1,0 +1,14 @@
+@1inch/limit-order-protocol-contract/=lib/cross-chain-swap/lib/limit-order-protocol/
+@1inch/limit-order-settlement/=lib/cross-chain-swap/lib/limit-order-settlement/
+@1inch/solidity-utils/=lib/cross-chain-swap/lib/solidity-utils/
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+cross-chain-swap/=lib/cross-chain-swap/
+ds-test/=lib/cross-chain-swap/lib/forge-std/lib/ds-test/src/
+erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/
+forge-std/=lib/forge-std/src/
+halmos-cheatcodes/=lib/openzeppelin-contracts/lib/halmos-cheatcodes/src/
+limit-order-protocol/=lib/cross-chain-swap/lib/limit-order-protocol/
+limit-order-settlement/=lib/cross-chain-swap/lib/limit-order-settlement/
+murky/=lib/cross-chain-swap/lib/murky/
+openzeppelin-contracts/=lib/openzeppelin-contracts/
+solidity-utils/=lib/cross-chain-swap/lib/solidity-utils/
