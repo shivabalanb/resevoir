@@ -1,8 +1,3 @@
-### commands
-
-anvil --fork-url https://eth-sepolia.g.alchemy.com/v2/euJp53PODQmQLSIuUpjlcMeQNtUBEtvT
-~/launch-local-near-cluster.sh
-
 # resevoir
 
 cargo-near-new-project-description
