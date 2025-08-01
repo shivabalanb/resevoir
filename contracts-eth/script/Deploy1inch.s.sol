@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Script} from "forge-std/Script.sol";
 import {console} from "forge-std/console.sol";
-import {MockToken} from "../src/MockToken.sol";
+import {MOCK} from "../src/MOCK.sol";
 
 // Import the necessary 1inch contracts from the submodules
 import {LimitOrderProtocol} from "limit-order-protocol/contracts/LimitOrderProtocol.sol";
@@ -23,10 +23,10 @@ contract Deploy1inch is Script {
 
         // --- Step 1: Deploy a Mock ERC20 Token ---
         // This will be used as the feeToken and accessToken
-        MockToken mockToken = new MockToken("Mock Token", "MOCK");
+        MOCK mock = new MOCK("MOCK", "MOCK");
         console.log(
-            "MockToken (for fees/access) deployed at:",
-            address(mockToken)
+            "MOCK (for fees/access) deployed at:",
+            address(mock)
         );
 
         // --- Step 2: Deploy the Limit Order Protocol ---
@@ -41,8 +41,8 @@ contract Deploy1inch is Script {
 
         EscrowFactory factory = new EscrowFactory(
             address(lop),
-            IERC20(address(mockToken)),
-            IERC20(address(mockToken)),
+            IERC20(address(mock)),
+            IERC20(address(mock)),
             deployerAddress, // The owner of the factory
             rescueDelay,
             rescueDelay
