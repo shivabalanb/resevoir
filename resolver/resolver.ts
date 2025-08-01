@@ -1,28 +1,24 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 
-const ETH_DATA = {
-    srcEscrowAddress: "0x",
-    immutables: {},
-    near_user_id: "",
-    near_hashlock: "",
-    near_amount: "1"
+import { approveTokens, createAndSignOrder, fillEthOrder } from "./ethereum";
 
-}
+/**
+ * The main function to orchestrate the entire swap.
+ */
+async function main() {
+  console.log("--- Starting ETH->NEAR Swap Simulation ---");
 
-async function main(){
-  console.log('--- Starting Resolver Script ---');
+  // await approveTokens();
+  const { order, signature } = await createAndSignOrder();
+  const fillTxReceipt = await fillEthOrder(order, signature);
 
-    console.log('\n--- Step 1: Locking funds on NEAR ---');
-    await lockFundsOnNear(ETH_DATA.near_user_id,ETH_DATA.near_hashlock,ETH_DATA.near_amount)
-
-      console.log('\n--- Step 2: Watching for secret on NEAR to claim on Ethereum ---');
-
-      const interval = setInterval(async ()=> {
-        const secret = awaitForSecretOnNear()
-        if(secret){
-            clearInterval(interval)
-            await claimFundsOnEth(ETH_DATA.srcEscrowAddress, secret, ETH_DATA.immutables)
-        }
-      },15000)
+  if (fillTxReceipt) {
+    console.log("[RESOLVER]: Order filled successfully!");
+    console.log("[RESOLVER]: Transaction hash:", fillTxReceipt.hash);
+  } else {
+    console.log("[RESOLVER]: Failed to fill order on Ethereum. Aborting.");
+  }
 }
 
 main().catch((error) => {
