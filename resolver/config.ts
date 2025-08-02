@@ -1,6 +1,6 @@
 import { z } from "zod";
 import * as dotenv from "dotenv";
-import Sdk from "@1inch/cross-chain-sdk";
+import * as Sdk from "@1inch/cross-chain-sdk";
 dotenv.config();
 
 const ConfigSchema = z.object({
