@@ -1,5 +1,5 @@
 import { Interface, Signature, TransactionRequest } from "ethers";
-import Sdk from "@1inch/cross-chain-sdk";
+import * as Sdk from "@1inch/cross-chain-sdk";
 import Contract from "./abi/Resolver.json";
 
 export class Resolver {
@@ -66,6 +66,22 @@ export class Resolver {
         escrow.toString(),
         immutables.build(),
       ]),
+    };
+  }
+
+  public executeApprove(
+    token: string,
+    spender: string,
+    amount: bigint // Using bigint for uint256
+  ): TransactionRequest {
+    return {
+      to: this.srcAddress, // The transaction is sent to the Resolver contract
+      data: this.iface.encodeFunctionData("executeApprove", [
+        token,
+        spender,
+        amount,
+      ]),
+      value: 0n, // No Ether is sent with an approve call
     };
   }
 }

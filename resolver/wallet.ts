@@ -73,10 +73,11 @@ export class Wallet {
         await tx.wait()
     }
 
-    public async approveToken(token: string, spender: string, amount: bigint): Promise<void> {
+    public async approveToken(token: string, spender: string, amount: bigint, nonce?: number): Promise<void> {
         const tx = await this.signer.sendTransaction({
             to: token.toString(),
-            data: '0x095ea7b3' + coder.encode(['address', 'uint256'], [spender.toString(), amount]).slice(2)
+            data: '0x095ea7b3' + coder.encode(['address', 'uint256'], [spender.toString(), amount]).slice(2),
+            nonce
         })
 
         await tx.wait()

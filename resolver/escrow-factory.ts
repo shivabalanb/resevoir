@@ -1,5 +1,5 @@
 import { id, Interface, JsonRpcProvider } from "ethers";
-import Sdk from "@1inch/cross-chain-sdk";
+import * as Sdk from "@1inch/cross-chain-sdk";
 import EscrowFactoryContract from "./abi/TestEscrowFactory.json";
 
 export class EscrowFactory {
@@ -7,7 +7,7 @@ export class EscrowFactory {
 
   constructor(
     private readonly provider: JsonRpcProvider,
-    private readonly address: string
+    readonly address: string
   ) {}
 
   public async getSourceImpl(): Promise<Sdk.Address> {

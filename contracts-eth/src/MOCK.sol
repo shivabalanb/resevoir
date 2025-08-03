@@ -8,4 +8,8 @@ contract MOCK is ERC20 {
         // Mint 1,000 tokens to the person who deploys the contract.
         _mint(msg.sender, 1_000 * 10 ** decimals());
     }
+
+    function mint(address to, uint256 amount) public {
+        _mint(to, amount);
+    }
 }
