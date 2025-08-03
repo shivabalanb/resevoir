@@ -1,6 +1,6 @@
 import {AbiCoder, Contract, JsonRpcProvider, Signer, TransactionRequest, Wallet as PKWallet} from 'ethers'
 import Sdk from '@1inch/cross-chain-sdk'
-import MOCK from './abi/MOCK.json'
+import MOCK from '../contracts-eth/out/MOCK.sol/MOCK.json'
 
 const coder = AbiCoder.defaultAbiCoder()
 

@@ -1,6 +1,7 @@
 import { Interface, Signature, TransactionRequest } from "ethers";
 import * as Sdk from "@1inch/cross-chain-sdk";
-import Contract from "./abi/Resolver.json";
+import Contract from "../contracts-eth/out/Resolver.sol/Resolver.json";
+import { TestEscrowFactory__factory } from "./types";
 
 export class Resolver {
   private readonly iface = new Interface(Contract.abi);
@@ -36,6 +37,24 @@ export class Resolver {
         args,
       ]),
       value: order.escrowExtension.srcSafetyDeposit,
+    };
+  }
+
+  public deployDst(
+    immutables: Sdk.Immutables,
+    escrowFactoryAddress: string // Pass the factory address in here
+  ): TransactionRequest {
+    // Create an interface for the EscrowFactory contract just for this call
+    const factoryIface = new Interface(TestEscrowFactory__factory.abi);
+
+    return {
+      // The transaction goes TO the EscrowFactory contract
+      to: escrowFactoryAddress,
+      // It calls the `createDstEscrow` function from the factory's ABI
+      data: factoryIface.encodeFunctionData("createSrcEscrow", [
+        immutables.build(),
+      ]),
+      value: immutables.safetyDeposit,
     };
   }
 
