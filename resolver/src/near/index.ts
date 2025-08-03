@@ -6,7 +6,7 @@ import { parseNearAmount } from "@near-js/utils";
 
 const CONTRACT_WASM_PATH = path.resolve(
   __dirname,
-  "../contracts-near/target/near/resevoir.wasm"
+  "../../../contracts-near/target/near/resevoir.wasm"
 );
 
 export async function deployNearEscrow(
@@ -27,7 +27,7 @@ export async function deployNearEscrow(
   const { createAccount, transfer, deployContract, functionCall } =
     actionCreators;
 
-  const storageCost = BigInt(parseNearAmount("1.5")!); 
+  const storageCost = BigInt(parseNearAmount("1.5")!);
   const depositPlusFees = deposit + storageCost;
 
   const actions = [
