@@ -9,9 +9,10 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 // Import routes
-import ethAccount from "./routes/ethAccount";
-import agentAccount from "./routes/agentAccount";
-import transaction from "./routes/transaction";
+import health from "./routes/health";
+import commit from "./routes/commit";
+import state from "./routes/state";
+
 
 const app = new Hono();
 
@@ -22,9 +23,9 @@ app.use(cors());
 app.get("/", (c) => c.json({ message: "App is running" }));
 
 // Routes
-app.route("/api/eth-account", ethAccount);
-app.route("/api/agent-account", agentAccount);
-app.route("/api/transaction", transaction);
+app.route("/api/health", health);
+app.route("/api/commit", commit);
+app.route("/api/state", state);
 
 // Start the server
 const port = Number(process.env.PORT || "3000");

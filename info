@@ -1,13 +1,56 @@
+# Replace YOUR_CONTRACT_ID with your actual contract account ID
+near contract call-function as-transaction shadeagent000.testnet new \
+  json-args '{"owner":"ac-proxy.shadeagent000.testnet"}' \
+  prepaid-gas '100 Tgas' \
+  attached-deposit '0 NEAR' \
+  sign-with-keychain send
+
+Empty result
+ INFO 
+
+ |    The "new" call to <shadeagent000.testnet> on behalf of <shadeagent000.testnet> succeeded.
+
+ |    Gas burned: 1.8 Tgas
+ |    Transaction fee: 0.0001704478066114 NEAR
+ |    Transaction ID: 8vkB8YoJq2NUXmBcGrHs9fg5jTcm2NhJq9A22LzSebNH
+ |    To see the transaction in the transaction explorer, please open this url in your browser:
+ |    https://explorer.testnet.near.org/transactions/8vkB8YoJq2NUXmBcGrHs9fg5jTcm2NhJq9A22LzSebNH
+
+
+
+Here is your console command if you need to script it or re-run:
+    near contract call-function as-transaction shadeagent000.testnet new json-args '{"owner":"ac-proxy.shadeagent000.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as shadeagent000.testnet network-config testnet sign-with-keychain send
+
+# deploy contract 
+near contract call-function as-transaction shadeagent000.testnet new \
+  json-args '{"owner":"1af660a79008c0ce0c5a5605c6107fd7f355a41cb407d4728300a4e15b35cdbb"}' \
+  prepaid-gas '100 Tgas' \
+  attached-deposit '0 NEAR'
+ |    ------------------------------------
+ INFO Function execution return value (printed to stdout):
+Empty result
+ INFO 
+
+ |    The "new" call to <shadeagent000.testnet> on behalf of <shadeagent000.testnet> succeeded.
+
+ |    Gas burned: 1.8 Tgas
+ |    Transaction fee: 0.0001709898097196 NEAR
+ |    Transaction ID: A7dLyStVHVSXcTKGZ5Mr1ooPu4YwWaTk4NYxtbLri2Gz
+ |    To see the transaction in the transaction explorer, please open this url in your browser:
+ |    https://explorer.testnet.near.org/transactions/A7dLyStVHVSXcTKGZ5Mr1ooPu4YwWaTk4NYxtbLri2Gz
+
+
+Here is your console command if you need to script it or re-run:
+    near contract deploy shadeagent000.testnet use-file ./target/near/contracts.wasm without-init-call network-config testnet sign-with-keychain send
+
 # create testnet account
 near account create-account sponsor-by-faucet-service shadeagent000.testnet autogenerate-new-keypair print-to-terminal network-config testnet create
-
-shivabalathandayuthapani@sb shade-agent % near account create-account sponsor-by-faucet-service shadeagent000.testnet autogenerate-new-keypair print-to-terminal network-config testnet create
- INFO Your transaction:
+INFO Your transaction:
  |    signer_id:    testnet
  |    actions:
  |       -- create account:      shadeagent000.testnet
  |       -- add access key:     
- |                       public key:   ed25519:Gk2wfVoFckY1B8QocUsLcgnNjzyPzssTvN9j4A4WdSs3
+ |                       public key:   ed25519:62f2cNwpLK23trL7ypL6PMEJqhR6uedgu471mcmoSQSZ
  |                       permission:   FullAccess
 
  INFO 
@@ -15,21 +58,15 @@ shivabalathandayuthapani@sb shade-agent % near account create-account sponsor-by
 
  |    --------------------  Access key info ------------------
  |                                    
- |    Master Seed Phrase: music ship own decade disagree twelve media live ozone armed parent discover
+ |    Master Seed Phrase: visit also sunset expose excess olympic stick bulb gym wife hospital hand
  |    Seed Phrase HD Path: m/44'/397'/0'
- |    Implicit Account ID: e9e5799d0b73bb0de4f803fab7629a2b244ce6dfe9d708effd1ac373d69aeaea
- |    Public Key: ed25519:Gk2wfVoFckY1B8QocUsLcgnNjzyPzssTvN9j4A4WdSs3
- |    SECRET KEYPAIR: ed25519:5yzGSEyRh5LdYcQt3LVJYLBRtheBi7ZQfGz1sLmoXp17y6hNupKhRvKHne6oL4NNEV92dpvwqRs738hKTN8xkLLh
+ |    Implicit Account ID: 4ab70378eed2c341efc161f5450baf67d21abc69755669c9dfb701ed6746930e
+ |    Public Key: ed25519:62f2cNwpLK23trL7ypL6PMEJqhR6uedgu471mcmoSQSZ
+ |    SECRET KEYPAIR: ed25519:5s5AZDEYCTLMa5bpQ1uxFRMfsSrBzV9oAiB3MAenAw6SVZAGo2pQZiz6dTx4vneU8iU3GBTJe4CakGZ4GA7tXWxd
  |                                    
  |    --------------------------------------------------------
 
  INFO 
- |    Transaction ID: D3tqJm4MwS9MWr3W6PscqRo9apGvFMwGYJ8JP2BL5ffn
+ |    Transaction ID: 9jPdGp795a1vQBzy8TWJy9gDxcEiuo1KdwMX6kEVGXbN
  |    To see the transaction in the transaction explorer, please open this url in your browser:
- |    https://explorer.testnet.near.org/transactions/D3tqJm4MwS9MWr3W6PscqRo9apGvFMwGYJ8JP2BL5ffn
-
-
-
-Here is your console command if you need to script it or re-run:
-    near account create-account sponsor-by-faucet-service shadeagent000.testnet autogenerate-new-keypair print-to-terminal network-config testnet create
-
+ |    https://explorer.testnet.near.org/transactions/9jPdGp795a1vQBzy8TWJy9gDxcEiuo1KdwMX6kEVGXbN
