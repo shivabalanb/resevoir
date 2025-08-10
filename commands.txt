@@ -1,0 +1,14 @@
+# call new() init with owner 
+near contract call-function as-transaction shadeagent000.testnet new json-args '{"owner":"ac-proxy.shadeagent000.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' sign-as shadeagent000.testnet network-config testnet sign-with-keychain send
+
+# create testnet account
+near account create-account sponsor-by-faucet-service shadeagent000.testnet autogenerate-new-keypair print-to-terminal network-config testnet create
+
+# deploy oracle_contract
+near contract deploy shadeagent000.testnet use-file ./target/near/oracle_contract.wasm without-init-call network-config testnet sign-with-keychain send
+near deploy shadeagent000.testnet ./target/near/oracle_contract.wasm
+
+
+# view NEAR Balance
+near account view-account-summary ac-proxy.shadeagent000.testnet network-config testnet now
+

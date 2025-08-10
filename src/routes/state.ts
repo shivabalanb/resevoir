@@ -1,16 +1,15 @@
 // src/routes/state.ts
 import { Hono } from "hono";
 import { agentView } from "@neardefi/shade-agent-js";
+import { CONTRACT_ID } from "../utils/near";
 
 const app = new Hono();
 
 app.get("/", async (c) => {
   try {
-    const contractId = process.env.NEAR_ACCOUNT_ID!;
     const rec = await agentView({
-      contractId,
-      methodName: "get_record", // ✅ Use methodName, not method
-      args: {}, // ✅ Empty args object
+      contractId: CONTRACT_ID,
+      methodName: "get_oracle_data",
     });
     return c.json(rec ?? null);
   } catch (e: any) {

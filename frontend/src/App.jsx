@@ -78,6 +78,17 @@ export default function App() {
             <h3 style={{ fontSize: "24px", color: "blue" }}>
               ${formatPrice(onChainRecord)}
             </h3>
+            {onChainRecord.description && (
+              <p
+                style={{
+                  fontSize: "14px",
+                  color: "darkblue",
+                  marginBottom: "10px",
+                }}
+              >
+                {onChainRecord.description}
+              </p>
+            )}
             <p style={{ fontSize: "12px", color: "gray" }}>
               {new Date(onChainRecord.timestamp).toLocaleString()}
             </p>
