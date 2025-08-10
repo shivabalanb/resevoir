@@ -1,6 +1,6 @@
 use near_sdk::{
     near, env, AccountId, PanicOnDefault, BorshStorageKey,
-    borsh::{self, BorshDeserialize, BorshSerialize},
+    borsh::{self, BorshDeserialize, BorshSerialize, BorshSchema},
     serde::{Deserialize, Serialize},
     store::LazyOption,
   };
@@ -10,9 +10,15 @@ use near_sdk::{
   pub struct OracleData {
     pub value: u128,
     pub decimals: u8,
-    pub description: String,
+    pub reasoning: String,  
     pub timestamp: u64,
     pub source: Option<String>,
+  }
+
+  #[derive(BorshDeserialize, BorshSerialize, Serialize, Deserialize, Clone, JsonSchema, BorshSchema)]
+  pub struct OracleConfig {
+    pub description: String,
+    pub api_url: String,
   }
   
   #[derive(BorshSerialize, BorshStorageKey)]
@@ -21,15 +27,16 @@ use near_sdk::{
   #[near(contract_state)]
   #[derive(PanicOnDefault)]
   pub struct OracleContract {
-    pub owner: AccountId,  // Made public so it can be viewed
+    pub owner: AccountId,  
+    pub config: OracleConfig,  
     record: LazyOption<OracleData>,
   }
   
   #[near]
   impl OracleContract {
     #[init]
-    pub fn new(owner: AccountId) -> Self {
-      Self { owner, record: LazyOption::new(StorageKey::Record, None) }
+    pub fn new(owner: AccountId, config: OracleConfig) -> Self {
+      Self { owner, config, record: LazyOption::new(StorageKey::Record, None) }
     }
   
     pub fn update_oracle_data(&mut self, rec: OracleData) {
@@ -41,9 +48,13 @@ use near_sdk::{
       self.record.get().clone()
     }
 
+    pub fn get_config(&self) -> OracleConfig {
+      self.config.clone()
+    }
+
     // Method to change the owner
     pub fn set_owner(&mut self, new_owner: AccountId) {
-      assert_eq!(env::predecessor_account_id(), self.owner, "only current owner");
+      // assert_eq!(env::predecessor_account_id(), self.owner, "only current owner");
       self.owner = new_owner;
     }
 

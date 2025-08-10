@@ -37,7 +37,7 @@ container_build_command = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 near-sdk = "5.14"
-borsh = { version = "1", features = ["derive"] }
+borsh = { version = "1", features = ["derive", "unstable__schema"] }
 serde = { version = "1", features = ["derive"] }
 schemars = { version = "0.8", features = ["derive"] }
 

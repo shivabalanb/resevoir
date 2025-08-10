@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== "production") {
 import health from "./routes/health";
 import commit from "./routes/commit";
 import state from "./routes/state";
-
+import oracleConfig from "./routes/oracle-config";
 
 const app = new Hono();
 
@@ -26,6 +26,7 @@ app.get("/", (c) => c.json({ message: "App is running" }));
 app.route("/api/health", health);
 app.route("/api/commit", commit);
 app.route("/api/state", state);
+app.route("/api/oracle-config", oracleConfig);
 
 // Start the server
 const port = Number(process.env.PORT || "3000");

@@ -7,15 +7,6 @@ const app = new Hono();
 app.post("/", async (c) => {
   try {
     const d = await fetchData(); // {value, decimals, timestamp, source}
-    console.log("Data to commit:", d);
-
-    console.log("Calling agent with:", {
-      contractId: CONTRACT_ID,
-      methodName: "update_oracle_data",
-      args: { rec: d },
-      gas: GAS,
-      deposit: "0",
-    });
 
     const res = await agentCall({
       contractId: CONTRACT_ID,
@@ -24,12 +15,8 @@ app.post("/", async (c) => {
       gas: GAS,
       deposit: "0",
     });
+    console.log("res", res);
 
-    // Handle the response properly - check the structure
-    console.log("Agent call response type:", typeof res);
-    console.log("Agent call response:", res);
-
-    // The response structure might be different, so handle it safely
     const txHash = res?.transaction_outcome?.id || res?.id || "unknown";
 
     return c.json({

@@ -7,6 +7,7 @@ export default function App() {
   const [error, setError] = useState("");
   const [onChainRecord, setOnChainRecord] = useState(null);
   const [isFetchingRecord, setIsFetchingRecord] = useState(true);
+  const [config, setConfig] = useState({ api_url: "", description: "" });
 
   const fetchAgentState = useCallback(async () => {
     setIsFetchingRecord(true);
@@ -29,9 +30,22 @@ export default function App() {
     }
   }, []);
 
+  const fetchConfig = useCallback(async () => {
+    try {
+      const response = await fetch(`${AGENT_API_URL}/api/oracle-config`);
+      if (response.ok) {
+        const data = await response.json();
+        setConfig(data.config);
+      }
+    } catch (err) {
+      console.error("Failed to fetch oracle config:", err);
+    }
+  }, []);
+
   useEffect(() => {
     fetchAgentState();
-  }, [fetchAgentState]);
+    fetchConfig();
+  }, [fetchAgentState, fetchConfig]);
 
   const handleCommit = async () => {
     setIsLoading(true);
@@ -69,6 +83,22 @@ export default function App() {
       <p>via Shade Agent</p>
 
       <div style={{ marginTop: "20px" }}>
+        <h2>Oracle Configuration</h2>
+        <div style={{ marginBottom: "20px" }}>
+          <p>
+            <strong>Description:</strong> {config.description || "Loading..."}
+          </p>
+          <p>
+            <strong>API URL:</strong> {config.api_url || "Loading..."}
+          </p>
+          <p style={{ fontSize: "12px", color: "gray" }}>
+            This oracle fetches data from the configured API URL and posts it to
+            the NEAR blockchain.
+          </p>
+        </div>
+      </div>
+
+      <div style={{ marginTop: "20px" }}>
         <h2>Last Recorded Price</h2>
 
         {isFetchingRecord ? (
@@ -78,7 +108,7 @@ export default function App() {
             <h3 style={{ fontSize: "24px", color: "blue" }}>
               ${formatPrice(onChainRecord)}
             </h3>
-            {onChainRecord.description && (
+            {onChainRecord.reasoning && (
               <p
                 style={{
                   fontSize: "14px",
@@ -86,7 +116,7 @@ export default function App() {
                   marginBottom: "10px",
                 }}
               >
-                {onChainRecord.description}
+                {onChainRecord.reasoning}
               </p>
             )}
             <p style={{ fontSize: "12px", color: "gray" }}>

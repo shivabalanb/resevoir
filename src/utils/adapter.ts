@@ -1,4 +1,70 @@
-import { parseJsonWithGemini } from "./gemini";
+import { fallback, parseJsonWithGemini } from "./gemini";
+import { agentView } from "@neardefi/shade-agent-js";
+import { CONTRACT_ID } from "./near";
+
+// Cached oracle config - fetched once from contract
+let cachedConfig: { description: string; api_url: string } | null = null;
+
+async function getOracleConfig(): Promise<{
+  description: string;
+  api_url: string;
+}> {
+  if (cachedConfig) {
+    return cachedConfig;
+  }
+
+  try {
+    const config = await agentView({
+      contractId: CONTRACT_ID,
+      methodName: "get_config",
+    });
+
+    cachedConfig = config;
+    return config;
+  } catch (error) {
+    console.warn("Failed to fetch oracle config from contract, using default");
+    return {
+      description: "This is an oracle powered by shade agents on NEAR",
+      api_url: "https://api.coinbase.com/v2/prices/ETH-USD/spot",
+    };
+  }
+}
+
+export async function fetchData() {
+  try {
+    // Get config from contract (includes both description and api_url)
+    const config = await getOracleConfig();
+    console.log("Fetching from:", config.api_url);
+
+    const r = await fetch(config.api_url);
+    const j = await r.json();
+
+    // Use Gemini for intelligent parsing
+    console.log("Oracle description:", config.description);
+    const parsed = await parseJsonWithGemini(j, config.description);
+
+    // Ensure proper types for NEAR contract
+    return {
+      value: Number(parsed.value) as number,
+      decimals: Number(parsed.decimals) as number,
+      reasoning: parsed.reasoning,
+      timestamp: Math.floor(parsed.timestamp) as number,
+      source: parsed.source,
+    };
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return fallback;
+  }
+}
+
+// let test = {
+//   value: 422627,
+//   decimals: 2,
+//   description: "ETH/USD price from SUS",
+//   timestamp: 1703123456789,
+//   source: "Coinbase",
+// };
+// return test;
 
 // export async function fetchData() {
 //   const r = await fetch(
@@ -14,105 +80,3 @@ import { parseJsonWithGemini } from "./gemini";
 //     source: "okx",
 //   };
 // }
-
-export async function fetchData() {
-  // let test = {
-  //   value: 422627,
-  //   decimals: 2,
-  //   description: "ETH/USD price from SUS",
-  //   timestamp: 1703123456789,
-  //   source: "Coinbase",
-  // };
-  // return test;
-  try {
-    // Fetch from Coinbase API
-    const r = await fetch("https://api.coinbase.com/v2/prices/ETH-USD/spot");
-    const j = await r.json();
-
-    // Use Gemini to parse the JSON response
-    const geminiApiKey = process.env.GEMINI_API_KEY;
-
-    if (geminiApiKey && geminiApiKey.length > 0) {
-      // Use Gemini for intelligent parsing
-      const parsed = await parseJsonWithGemini(
-        j,
-        "ETH/USD price from Coinbase"
-      );
-
-      // Ensure proper types for NEAR contract
-      return {
-        value: Number(parsed.value) as number, // Gemini already provides the correct integer value
-        decimals: Number(parsed.decimals) as number, // Ensure it's a number
-        description: parsed.description,
-        timestamp: Math.floor(parsed.timestamp) as number, // Ensure integer timestamp
-        source: parsed.source,
-      };
-    } else {
-      // Fallback to manual parsing
-      const usd = j.data.amount as number;
-      return {
-        value: Math.round(usd * 100), // Convert to integer and then to string
-        decimals: 2, // Small integer
-        description: "ETH/USD price from Coinbase",
-        timestamp: Math.floor(Date.now()), // Ensure integer timestamp
-        source: "coinbase",
-      };
-    }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    // Return fallback data
-    return {
-      value: "0", // Simple string for error case
-      decimals: 2, // Small integer
-      description: "Error fetching data",
-      timestamp: Math.floor(Date.now()).toString(), // Ensure integer timestamp
-      source: "error",
-    };
-  }
-}
-
-// Function to fetch from any API with Gemini parsing
-export async function fetchDataFromApi(
-  apiUrl: string,
-  description: string,
-  apiKey?: string
-) {
-  try {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-    if (apiKey) {
-      headers["Authorization"] = `Bearer ${apiKey}`;
-    }
-
-    const response = await fetch(apiUrl, { headers });
-    const jsonData = await response.json();
-
-    const geminiApiKey = process.env.GEMINI_API_KEY;
-
-    if (geminiApiKey && geminiApiKey.length > 0) {
-      const parsed = await parseJsonWithGemini(jsonData, description);
-
-      // Ensure proper types for NEAR contract
-      return {
-        value: parsed.value.toString(), // Gemini already provides the correct integer value
-        decimals: Number(parsed.decimals) as number, // Ensure it's a number
-        description: parsed.description,
-        timestamp: Math.floor(parsed.timestamp).toString(), // Ensure integer timestamp
-        source: parsed.source,
-      };
-    } else {
-      throw new Error("Gemini API key not configured");
-    }
-  } catch (error) {
-    console.error(`Error fetching from ${apiUrl}:`, error);
-    return {
-      value: "0", // Simple string for error case
-      decimals: 2, // Small integer
-      description: `Error fetching from ${apiUrl}`,
-      timestamp: Math.floor(Date.now()).toString(), // Ensure integer timestamp
-      source: "error",
-    };
-  }
-}
